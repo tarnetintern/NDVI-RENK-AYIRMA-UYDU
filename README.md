@@ -2,3 +2,5 @@
 uydudan veri çekip indirip arşivden çıkarıyorum
 j2 olan dosyaları tif dosyasına dönüştürüp ndvı analizine sokacağım
 bu 2. kısım olmadı daha.
+https://batuhanokmen.com/
+https://www.tarnet.com.tr/
