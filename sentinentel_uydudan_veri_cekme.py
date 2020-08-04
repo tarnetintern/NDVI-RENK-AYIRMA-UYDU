@@ -54,22 +54,43 @@ Archive(arsiv_adi+'.zip').extractall('indirilen_dosya')
 
 dosya_yer_=('indirilen_dosya/'+arsiv_adi+".SAFE"+'/GRANULE/L1C_T35TPE_A002678_20151227T085356/IMG_DATA')
 resim_isim=os.listdir(dosya_yer_)
-resim_isim[2]
-resim_isim[3]
 
-
-jp2ler = [resim_isim[2],resim_isim[3]]
-bands = []
-
-#burası bizim jp2 dosyalarımızı okuyacak
-
-for jp2 in jp2ler:
-    with rasterio.open(dosya_yer_+"/"+jp2) as f:
-        bands.append(f.read(1))
-
-#resimlerimizi ayrıştırdık özel bantlara
-band_red=bands[0]
-band_nir=bands[1]
+if resim_isim == "R10m" or "R20m" or "R60m":
+    dosya_yer_=(arsiv_adi+".SAFE"+'/GRANULE/'+img_data_klasor_ismi+'/IMG_DATA/R60m')
+    resim_isim=os.listdir(dosya_yer_)
+    resim_isim[2]
+    resim_isim[3]
+        
+    jp2ler = [resim_isim[2],resim_isim[3]]
+    bands = []
+    
+    #burası bizim jp2 dosyalarımızı okuyacak
+    
+    for jp2 in jp2ler:
+        with rasterio.open(dosya_yer_+"/"+jp2) as f:
+            bands.append(f.read(1))
+    
+    #resimlerimizi ayrıştırdık özel bantlara
+    band_red=bands[0]
+    band_nir=bands[1]
+else:
+        
+    resim_isim[2]
+    resim_isim[3]
+    
+    
+    jp2ler = [resim_isim[2],resim_isim[3]]
+    bands = []
+    
+    #burası bizim jp2 dosyalarımızı okuyacak
+    
+    for jp2 in jp2ler:
+        with rasterio.open(dosya_yer_+"/"+jp2) as f:
+            bands.append(f.read(1))
+    
+    #resimlerimizi ayrıştırdık özel bantlara
+    band_red=bands[0]
+    band_nir=bands[1]
 
 
 # Klasik NDVI denklemi ile hesaplama
