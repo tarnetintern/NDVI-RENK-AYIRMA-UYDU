@@ -17,9 +17,9 @@ import os
 api = SentinelAPI('flavves', 'BATUhan123.', 'https://scihub.copernicus.eu/dhus')
 
 #geojson dosyası ile hangi alanı incelemek istiyorsak o alana gidiyoruz ve seçiyoruz kaydete basarak geojson olarak almak istediğimizi söylüyoruz
-footprint = geojson_to_wkt(read_geojson('map.geojson'))
+footprint = geojson_to_wkt(read_geojson('map6.geojson'))
 products = api.query(footprint,
-                     date=('20151219', date(2015, 12, 29)),
+                     date=('20191219', date(2019, 12, 29)),
                      platformname='Sentinel-2')
 
 # pandas dataframe yap
@@ -31,6 +31,9 @@ products_df_sorted = products_df_sorted.head(5)
 
 # arşiv indirmesini burada yapıyoruz
 api.download_all(products_df_sorted.index)
+
+
+
 
 #index verisinden kullanıcı kodu çekme
 
@@ -44,35 +47,60 @@ veri_cekme2=veri_cekme[1]
 Bu işlem arşivden çıkarmak için gerekli arşivin adı indirdiğimiz verinin title adı oluyor
 
 """
-arsiv_adi=api.get_product_odata(veri_cekme2)
+arsiv_adi=api.get_product_odata(veri_cekme1)
 arsiv_adi=arsiv_adi["title"]
 arsiv_adi=str(arsiv_adi)
 
 #arşivden çıkarmak için arşiv kütüphanesini ekledik
-from pyunpack import Archive
 
-Archive(arsiv_adi+'.zip').extractall('indirilen_dosya')
 
-dosya_yer_=('indirilen_dosya/'+arsiv_adi+".SAFE"+'/GRANULE/L1C_T35TPE_A002678_20151227T085356/IMG_DATA')
+from archive import Archive
+a = Archive(arsiv_adi+'.zip')
+a.extract()
+img_data_klasor_ismi=os.listdir((arsiv_adi+".SAFE"+'/GRANULE'))
+img_data_klasor_ismi=img_data_klasor_ismi[0]
+img_data_klasor_ismi=str(img_data_klasor_ismi)
+dosya_yer_=(arsiv_adi+".SAFE"+'/GRANULE/'+img_data_klasor_ismi+'/IMG_DATA')
 resim_isim=os.listdir(dosya_yer_)
-resim_isim[2]
-resim_isim[3]
 
-
-jp2ler = [resim_isim[2],resim_isim[3]]
-bands = []
-
-#burası bizim jp2 dosyalarımızı okuyacak
-
-for jp2 in jp2ler:
-    with rasterio.open(dosya_yer_+"/"+jp2) as f:
-        bands.append(f.read(1))
-
-#resimlerimizi ayrıştırdık özel bantlara
-band_red=bands[0]
-band_nir=bands[1]
-
-
+if resim_isim == "R10m" or "R20m" or "R60m":
+    dosya_yer_=(arsiv_adi+".SAFE"+'/GRANULE/'+img_data_klasor_ismi+'/IMG_DATA/R60m')
+    resim_isim=os.listdir(dosya_yer_)
+    resim_isim[2]
+    resim_isim[3]
+        
+    jp2ler = [resim_isim[2],resim_isim[3]]
+    bands = []
+    
+    #burası bizim jp2 dosyalarımızı okuyacak
+    
+    for jp2 in jp2ler:
+        with rasterio.open(dosya_yer_+"/"+jp2) as f:
+            bands.append(f.read(1))
+    
+    #resimlerimizi ayrıştırdık özel bantlara
+    band_red=bands[0]
+    band_nir=bands[1]
+else:
+        
+    resim_isim[2]
+    resim_isim[3]
+    
+    
+    jp2ler = [resim_isim[2],resim_isim[3]]
+    bands = []
+    
+    #burası bizim jp2 dosyalarımızı okuyacak
+    
+    for jp2 in jp2ler:
+        with rasterio.open(dosya_yer_+"/"+jp2) as f:
+            bands.append(f.read(1))
+    
+    #resimlerimizi ayrıştırdık özel bantlara
+    band_red=bands[0]
+    band_nir=bands[1]
+        
+        
 # Klasik NDVI denklemi ile hesaplama
 np.seterr(divide='ignore', invalid='ignore')
 
@@ -127,7 +155,7 @@ ax.axis('off')
 ax.set_title('NDVI görüntüsü', fontsize=18, fontweight='bold')
 
 cbar = fig.colorbar(cax, orientation='horizontal', shrink=0.65)
-fig_kaydet="ndvi_sonuc/"+resim_isim[2]+".png"
+fig_kaydet="ndvi_sonuc/"+resim_isim[2]+".tif"
 fig.savefig(fig_kaydet, dpi=200, bbox_inches='tight', pad_inches=0.7)
 
 plt.show()
